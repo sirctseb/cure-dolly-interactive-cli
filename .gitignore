@@ -20,6 +20,9 @@
 /.next/
 /out/
 
+# generated lesson content
+/content/lessons/
+
 # production
 /build
 

@@ -1,10 +1,11 @@
 {
-  "name": "cure-dolly-init",
+  "name": "cure-dolly-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build:lessons": "tsx scripts/build-lessons.ts",
+    "build": "npm run build:lessons && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -21,7 +22,13 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "rehype-raw": "^7.0.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.21.0",
+    "typescript": "^5",
+    "unified": "^11.0.5"
   }
 }
