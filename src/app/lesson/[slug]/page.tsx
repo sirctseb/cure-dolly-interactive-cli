@@ -4,6 +4,7 @@ import { LESSON_ORDER } from "@/lib/lesson-order";
 import { LessonContent } from "@/components/LessonContent";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { LessonNav } from "@/components/LessonNav";
+import { Chat } from "@/components/Chat";
 import Link from "next/link";
 
 export function generateStaticParams() {
@@ -48,6 +49,8 @@ export default async function LessonPage({
       {lesson.youtubeId && <YouTubeEmbed videoId={lesson.youtubeId} />}
 
       <LessonContent html={lesson.html} />
+
+      <Chat lessonSlug={slug} />
 
       <LessonNav prev={prev} next={next} />
     </main>
