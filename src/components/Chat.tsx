@@ -90,7 +90,7 @@ export function Chat({ lessonSlug }: { lessonSlug: string }) {
   function handleStart() {
     setStarted(true);
     const initialMessages: Message[] = [
-      { role: "user", content: "Please present this lesson and then start practice exercises." },
+      { role: "user", content: "Start practice exercises for this lesson." },
     ];
     setMessages(initialMessages);
     sendMessages(initialMessages);

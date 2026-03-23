@@ -5,6 +5,8 @@ import { getLessonIndex } from "@/lib/lessons";
 const anthropic = new Anthropic();
 
 export async function POST(request: Request) {
+  const key = anthropic.apiKey;
+  console.log({ key });
   const { messages, lessonSlug } = (await request.json()) as {
     messages: { role: "user" | "assistant"; content: string }[];
     lessonSlug: string;
@@ -35,19 +37,18 @@ export async function POST(request: Request) {
             event.delta.type === "text_delta"
           ) {
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
+              encoder.encode(
+                `data: ${JSON.stringify({ text: event.delta.text })}\n\n`,
+              ),
             );
           }
         }
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Unknown error";
+        const message = err instanceof Error ? err.message : "Unknown error";
         controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({ error: message })}\n\n`
-          )
+          encoder.encode(`data: ${JSON.stringify({ error: message })}\n\n`),
         );
         controller.close();
       }

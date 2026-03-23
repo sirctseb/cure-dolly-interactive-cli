@@ -117,5 +117,5 @@ export function buildSystemPrompt(lessonSlug: string): string {
 ${lessonText}
 
 ---
-Present this lesson's content to the learner, then begin a practice session exercising the grammar points covered.`;
+The learner is reading the lesson content on the web page above this chat. Do NOT present or summarize the lesson content. Go straight to practice exercises. Start with a brief greeting and your first exercise prompt.`;
 }

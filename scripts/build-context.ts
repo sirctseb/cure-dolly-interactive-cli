@@ -50,8 +50,12 @@ Keep each list concise — capture what a tutor would need to know about what ha
 
 async function extractContext(
   slug: string,
-  mdContent: string
-): Promise<{ grammarPoints: string[]; keyVocabulary: string[]; conceptualFramings: string[] }> {
+  mdContent: string,
+): Promise<{
+  grammarPoints: string[];
+  keyVocabulary: string[];
+  conceptualFramings: string[];
+}> {
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 2048,
@@ -78,14 +82,17 @@ async function extractContext(
 
 function parseTitle(line: string): { number: string; title: string } {
   const match = line.match(
-    /^#\s+\*?\*?(\d+(?:\.\d+)?[a-z]?)[\.\s]+(.+?)(?:\*\*)?$/
+    /^#\s+\*?\*?(\d+(?:\.\d+)?[a-z]?)[\.\s]+(.+?)(?:\*\*)?$/,
   );
   if (match) {
     return { number: match[1], title: match[2].replace(/\*+$/g, "").trim() };
   }
   return {
     number: "",
-    title: line.replace(/^#+\s*\**/g, "").replace(/\*+$/g, "").trim(),
+    title: line
+      .replace(/^#+\s*\**/g, "")
+      .replace(/\*+$/g, "")
+      .trim(),
   };
 }
 
@@ -132,7 +139,7 @@ async function main() {
   }
 
   console.log(
-    `Done. Processed: ${processed}, Skipped (already exists): ${skipped}`
+    `Done. Processed: ${processed}, Skipped (already exists): ${skipped}`,
   );
 }
 
