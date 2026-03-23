@@ -7,12 +7,17 @@ interface Message {
   content: string;
 }
 
-type Phase = "idle" | "loading-prompt" | "prompting" | "loading-feedback" | "feedback";
+type Phase =
+  | "idle"
+  | "loading-prompt"
+  | "prompting"
+  | "loading-feedback"
+  | "feedback";
 
 async function streamResponse(
   messages: Message[],
   lessonSlug: string,
-  onText: (text: string) => void
+  onText: (text: string) => void,
 ): Promise<string> {
   const response = await fetch("/api/chat", {
     method: "POST",
@@ -76,7 +81,10 @@ export function Exercise({ lessonSlug }: { lessonSlug: string }) {
     setUserAnswer("");
     setError(null);
 
-    const msgs: Message[] = [...currentHistory, { role: "user", content: "next" }];
+    const msgs: Message[] = [
+      ...currentHistory,
+      { role: "user", content: "next" },
+    ];
 
     try {
       const result = await streamResponse(msgs, lessonSlug, setPrompt);
@@ -120,7 +128,7 @@ export function Exercise({ lessonSlug }: { lessonSlug: string }) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       e.preventDefault();
       submitAnswer();
     }
@@ -135,7 +143,9 @@ export function Exercise({ lessonSlug }: { lessonSlug: string }) {
             Translate English to Japanese using the grammar from this lesson.
           </p>
           {error && (
-            <p className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</p>
+            <p className="text-red-600 dark:text-red-400 text-sm mb-4">
+              {error}
+            </p>
           )}
           <button
             onClick={() => fetchExercise(history)}
