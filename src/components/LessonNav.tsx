@@ -12,7 +12,7 @@ export function LessonNav({
     <nav className="flex justify-between items-center py-6 border-t border-gray-200 dark:border-gray-700 mt-8">
       {prev ? (
         <Link
-          href={`/lesson/${prev.slug}`}
+          href={`/lesson/${prev.number}`}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
         >
           &larr; {prev.number}. {prev.title}
@@ -22,7 +22,7 @@ export function LessonNav({
       )}
       {next ? (
         <Link
-          href={`/lesson/${next.slug}`}
+          href={`/lesson/${next.number}`}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline text-right"
         >
           {next.number}. {next.title} &rarr;

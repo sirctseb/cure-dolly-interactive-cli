@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
-import { getLesson, getAdjacentLessons, getLessonIndex } from "@/lib/lessons";
-import { LESSON_ORDER } from "@/lib/lesson-order";
+import {
+  getLessonByNumber,
+  getAdjacentLessonsByNumber,
+  getAllLessonNumbers,
+} from "@/lib/lessons";
 import { LessonContent } from "@/components/LessonContent";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { LessonNav } from "@/components/LessonNav";
@@ -8,34 +11,30 @@ import { Exercise } from "@/components/Exercise";
 import Link from "next/link";
 
 export function generateStaticParams() {
-  return LESSON_ORDER.map((slug) => ({ slug }));
+  return getAllLessonNumbers().map((number) => ({ number }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ number: string }>;
 }) {
-  // This is fine as a sync-like usage since generateStaticParams provides all slugs
-  return params.then(({ slug }) => {
-    const idx = getLessonIndex(slug);
-    if (idx === -1) return { title: "Not Found" };
-    const lesson = getLesson(slug);
-    return { title: `${lesson.number}. ${lesson.title} — Cure Dolly` };
-  });
+  const { number } = await params;
+  const lesson = getLessonByNumber(number);
+  if (!lesson) return { title: "Not Found" };
+  return { title: `${lesson.number}. ${lesson.title} — Cure Dolly` };
 }
 
 export default async function LessonPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ number: string }>;
 }) {
-  const { slug } = await params;
-  const idx = getLessonIndex(slug);
-  if (idx === -1) notFound();
+  const { number } = await params;
+  const lesson = getLessonByNumber(number);
+  if (!lesson) notFound();
 
-  const lesson = getLesson(slug);
-  const { prev, next } = getAdjacentLessons(slug);
+  const { prev, next } = getAdjacentLessonsByNumber(number);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
@@ -50,7 +49,7 @@ export default async function LessonPage({
 
       <LessonContent html={lesson.html} />
 
-      <Exercise lessonSlug={slug} />
+      <Exercise lessonSlug={lesson.slug} />
 
       <LessonNav prev={prev} next={next} />
     </main>

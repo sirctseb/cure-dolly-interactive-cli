@@ -39,6 +39,27 @@ export function getLessonIndex(slug: string): number {
   return LESSON_ORDER.indexOf(slug);
 }
 
+export function getLessonByNumber(number: string): Lesson | null {
+  const slug = LESSON_ORDER.find((s) => {
+    const lesson = getLesson(s);
+    return lesson.number === number;
+  });
+  return slug ? getLesson(slug) : null;
+}
+
+export function getAdjacentLessonsByNumber(number: string): {
+  prev: LessonSummary | null;
+  next: LessonSummary | null;
+} {
+  const lesson = getLessonByNumber(number);
+  if (!lesson) return { prev: null, next: null };
+  return getAdjacentLessons(lesson.slug);
+}
+
+export function getAllLessonNumbers(): string[] {
+  return LESSON_ORDER.map((slug) => getLesson(slug).number);
+}
+
 export function getAdjacentLessons(slug: string): {
   prev: LessonSummary | null;
   next: LessonSummary | null;

@@ -7,7 +7,7 @@ export function TableOfContents({ lessons }: { lessons: LessonSummary[] }) {
       {lessons.map((lesson) => (
         <li key={lesson.slug}>
           <Link
-            href={`/lesson/${lesson.slug}`}
+            href={`/lesson/${lesson.number}`}
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
             {lesson.number}. {lesson.title}

@@ -5,8 +5,6 @@ import { getLessonIndex } from "@/lib/lessons";
 const anthropic = new Anthropic();
 
 export async function POST(request: Request) {
-  const key = anthropic.apiKey;
-  console.log({ key });
   const { messages, lessonSlug } = (await request.json()) as {
     messages: { role: "user" | "assistant"; content: string }[];
     lessonSlug: string;
