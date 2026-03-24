@@ -60,6 +60,19 @@ export function getAllLessonNumbers(): string[] {
   return LESSON_ORDER.map((slug) => getLesson(slug).number);
 }
 
+/** Strip the leading number prefix from a slug to get the vanity portion. */
+export function getVanitySlug(slug: string): string {
+  // "2-the-invisible-carriage..." → "the-invisible-carriage..."
+  // "7-5-conjugation" → "conjugation"
+  // "8b-particles-explained" → "particles-explained"
+  return slug.replace(/^\d+(?:-5|[a-z])?-/, "");
+}
+
+/** Build the full lesson URL path. */
+export function lessonUrl(lesson: LessonSummary): string {
+  return `/lesson/${lesson.number}/${getVanitySlug(lesson.slug)}`;
+}
+
 export function getAdjacentLessons(slug: string): {
   prev: LessonSummary | null;
   next: LessonSummary | null;

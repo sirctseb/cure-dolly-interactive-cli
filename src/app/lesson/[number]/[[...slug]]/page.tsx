@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import {
   getLessonByNumber,
   getAdjacentLessonsByNumber,
-  getAllLessonNumbers,
+  getAllLessonSummaries,
+  getVanitySlug,
 } from "@/lib/lessons";
 import { LessonContent } from "@/components/LessonContent";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
@@ -11,7 +12,10 @@ import { Exercise } from "@/components/Exercise";
 import Link from "next/link";
 
 export function generateStaticParams() {
-  return getAllLessonNumbers().map((number) => ({ number }));
+  return getAllLessonSummaries().map((l) => ({
+    number: l.number,
+    slug: [getVanitySlug(l.slug)],
+  }));
 }
 
 export async function generateMetadata({

@@ -102,18 +102,19 @@ function preprocessMarkdown(md: string): string {
 
   result = output.join("\n");
 
-  // Convert cross-reference links from ./filename.md to /lesson/number
-  // Filename starts with the lesson number, e.g., 4-japanese-verb-tenses.md → /lesson/4
+  // Convert cross-reference links from ./filename.md to /lesson/number/vanity-slug
+  // Filename: "4-japanese-verb-tenses" → "/lesson/4/japanese-verb-tenses"
   result = result.replace(
     /\(\.\/([^)]+)\.md\)/g,
     (_match, filename) => {
-      // Extract lesson number from filename: "4-..." → "4", "7-5-..." → "7.5", "8b-..." → "8b"
-      const numMatch = filename.match(/^(\d+)-5-/) // e.g., 7-5-conjugation → 7.5
-        ? filename.match(/^(\d+)-5-/)
-        : filename.match(/^(\d+[a-z]?)-/);  // e.g., 8b-... → 8b, 4-... → 4
-      if (numMatch) {
-        const num = filename.match(/^(\d+)-5-/) ? `${numMatch![1]}.5` : numMatch[1];
-        return `(/lesson/${num})`;
+      // Extract lesson number and vanity slug from filename
+      const is75 = filename.match(/^(\d+)-5-(.+)$/); // e.g., 7-5-conjugation → 7.5, conjugation
+      const normal = filename.match(/^(\d+[a-z]?)-(.+)$/); // e.g., 8b-foo → 8b, foo
+      if (is75) {
+        return `(/lesson/${is75[1]}.5/${is75[2]})`;
+      }
+      if (normal) {
+        return `(/lesson/${normal[1]}/${normal[2]})`;
       }
       return `(/lesson/${filename})`;
     }

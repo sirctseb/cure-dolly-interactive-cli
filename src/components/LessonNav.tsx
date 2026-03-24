@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { lessonUrl } from "@/lib/lessons";
 import type { LessonSummary } from "@/lib/lessons";
 
 export function LessonNav({
@@ -12,7 +13,7 @@ export function LessonNav({
     <nav className="flex justify-between items-center py-6 border-t border-gray-200 dark:border-gray-700 mt-8">
       {prev ? (
         <Link
-          href={`/lesson/${prev.number}`}
+          href={lessonUrl(prev)}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
         >
           &larr; {prev.number}. {prev.title}
@@ -22,7 +23,7 @@ export function LessonNav({
       )}
       {next ? (
         <Link
-          href={`/lesson/${next.number}`}
+          href={lessonUrl(next)}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline text-right"
         >
           {next.number}. {next.title} &rarr;
