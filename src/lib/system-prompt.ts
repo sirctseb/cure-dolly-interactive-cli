@@ -3,6 +3,8 @@ import path from "path";
 import { getLesson } from "./lessons";
 import { LESSON_ORDER } from "./lesson-order";
 
+const LESSONS_DIR = path.join(process.cwd());
+
 interface LessonContext {
   number: string;
   title: string;
@@ -95,14 +97,19 @@ export function buildSystemPrompt(lessonSlug: string): string {
     }
   }
 
-  const lessonText = lesson.html
-    .replace(/<[^>]+>/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  // Use the original markdown — it's cleaner and better-structured than
+  // stripped HTML, which helps smaller models stay on-topic.
+  const lessonMarkdown = readFileSync(
+    path.join(LESSONS_DIR, `${lesson.slug}.md`),
+    "utf-8"
+  );
 
   return `${COURSE_GUIDELINES}${priorSummary}
 
 ## Current Lesson: ${lesson.number}. ${lesson.title}
 
-${lessonText}`;
+${lessonMarkdown}
+
+---
+IMPORTANT: Only use vocabulary and grammar from this lesson and previously covered lessons. Do not introduce vocabulary or grammar patterns the learner has not seen yet.`;
 }
