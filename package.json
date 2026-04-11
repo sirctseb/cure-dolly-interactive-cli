@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build:lessons": "tsx scripts/build-lessons.ts",
     "build:context": "tsx scripts/build-context.ts",
-    "build": "npm run build:lessons && next build",
+    "build": "npm run build:lessons && cp -r media public/media && next build",
     "start": "next start",
     "lint": "eslint"
   },

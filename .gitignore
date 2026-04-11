@@ -23,6 +23,9 @@
 # generated lesson content
 /content/lessons/
 
+# copied media (build artifact)
+/public/media/
+
 # production
 /build
 
