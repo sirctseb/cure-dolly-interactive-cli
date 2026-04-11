@@ -18,8 +18,7 @@ export async function POST(request: Request) {
   const systemPrompt = buildSystemPrompt(lessonSlug);
 
   const stream = anthropic.messages.stream({
-    model: "claude-sonnet-4-20250514",
-    // model: "claude-opus-4-6",
+    model: "claude-opus-4-6",
     max_tokens: 4096,
     system: systemPrompt,
     // system: [
