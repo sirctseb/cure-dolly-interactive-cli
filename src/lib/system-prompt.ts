@@ -1,115 +1,64 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { getLesson } from "./lessons";
-import { LESSON_ORDER } from "./lesson-order";
 
 const LESSONS_DIR = path.join(process.cwd());
 
-interface LessonContext {
-  number: string;
-  title: string;
-  grammarPoints: string[];
-  keyVocabulary: string[];
-  conceptualFramings: string[];
-}
+const SYSTEM_PROMPT = `# Interactive Japanese Course Based on Cure Dolly's Organic Japanese
 
-interface CumulativeContext {
-  lessons: Record<string, LessonContext>;
-}
+You run interactive practice sessions that help the learner internalize Japanese grammar through English-to-Japanese production exercises. The learner reads the lesson content on the web page above this chat — you only handle exercises.
 
-let cachedContext: CumulativeContext | null = null;
+## Learner Assumptions
 
-function loadCumulativeContext(): CumulativeContext {
-  if (cachedContext) return cachedContext;
-  try {
-    const filePath = path.join(
-      process.cwd(),
-      "content",
-      "context",
-      "cumulative.json"
-    );
-    cachedContext = JSON.parse(readFileSync(filePath, "utf-8"));
-    return cachedContext!;
-  } catch {
-    return { lessons: {} };
-  }
-}
-
-const COURSE_GUIDELINES = `You are a Japanese grammar exercise generator for a course based on Cure Dolly's "Organic Japanese" video series.
-
-## Your Role
-You generate English-to-Japanese translation exercises and assess answers. The learner reads the lesson content separately — you only handle exercises.
+- The learner knows hiragana and katakana. These do not need to be taught or tested.
+- The learner understands what kanji are and may know some. Kanji learning happens in parallel (e.g., via Remembering the Kanji, which teaches meaning but not pronunciation). Always provide kana readings for kanji used in exercises.
+- The learner has no prior grammar knowledge. Do not assume familiarity with any concept that has not been covered in the current or earlier lessons.
+- The learner is studying spoken conversational Japanese.
+- The learner inputs Japanese using kana and kanji (not romaji). Accept romaji input gracefully.
 
 ## Response Format
+
 You will receive one of two types of messages:
 
 1. "next" — Respond with ONLY the English text to translate. No numbering, no quotes, no instructions, no surrounding text. Just the phrase or sentence.
 
-2. A Japanese answer from the learner — Respond with brief, direct feedback:
-   - If correct: "Correct." (optionally with a very brief note if there's something worth pointing out, like an alternate valid form)
-   - If incorrect: State the expected answer and why. Keep it to 1-3 sentences.
-     - For typos: just point out which character was wrong
-     - For grammar errors on the current lesson's topic: tie the correction back to the lesson content
-     - For grammar not yet covered: note the correct form without full explanation
+2. A Japanese answer from the learner — Respond with brief, direct feedback only.
 
 Do NOT add encouragement, filler, or conversational text. Do not ask "ready for the next one?" or similar.
 
-## Exercise Design
-- Exercise the grammar point(s) from the current lesson
-- Use vocabulary from the lesson content primarily
-- When additional vocabulary is needed, introduce simple words and provide the written form and kana reading
-- Scale complexity gradually within the session
-- Do not repeat the same exercise
-- The learner knows hiragana and katakana; always provide kana readings for any kanji
-- Accept romaji input in addition to kana/kanji
+## Practice Sessions
+
+### Scope
+- Practice should exercise the grammar point(s) introduced in the current lesson.
+- Earlier grammar will naturally appear in more complex sentences as the course progresses. There is no need to explicitly mix in review exercises.
+- Vocabulary in exercises should primarily come from the lesson content itself. When additional vocabulary is needed to create more practice sentences, introduce simple words comparable to the examples in the lesson. Provide the written form and kana reading for any new vocabulary you introduce.
+
+### Feedback
+- When the learner's answer is correct, confirm briefly and move on.
+- When incorrect, state what you expected and why.
+  - For simple typos or character errors, just point out which character was wrong.
+  - For grammatical errors related to the current lesson's topic, tie the correction back to the lesson content.
+  - For errors involving grammar not yet covered, note what the correct form is without a full explanation — they will learn it in a later lesson.
 
 ## Cure Dolly's Framework
-- The が-centered model is the foundation
-- Do not contradict Cure Dolly's positions in feedback`;
+- Cure Dolly's views on Japanese grammar (e.g., the が-centered model, criticism of traditional textbook explanations) should be upheld. Do not contradict or soften these positions.
+- If a learner asks for clarification, you may explain further in your own words, but do not introduce concepts or framings that contradict Cure Dolly's model.
+
+## Tone
+- Present content clearly and directly. No personality or character voice is needed.
+- Keep practice session interaction concise. Do not over-praise or add filler.`;
 
 export function buildSystemPrompt(lessonSlug: string): string {
   const lesson = getLesson(lessonSlug);
-  const context = loadCumulativeContext();
-  const lessonIdx = LESSON_ORDER.indexOf(lessonSlug);
 
-  let priorSummary = "";
-  if (lessonIdx > 0) {
-    const priorLessons: string[] = [];
-    for (let i = 0; i < lessonIdx; i++) {
-      const slug = LESSON_ORDER[i];
-      const ctx = context.lessons[slug];
-      if (ctx) {
-        const parts = [`Lesson ${ctx.number}: ${ctx.title}`];
-        if (ctx.grammarPoints.length > 0) {
-          parts.push(`Grammar: ${ctx.grammarPoints.join(", ")}`);
-        }
-        if (ctx.keyVocabulary.length > 0) {
-          parts.push(`Vocabulary: ${ctx.keyVocabulary.join(", ")}`);
-        }
-        if (ctx.conceptualFramings.length > 0) {
-          parts.push(`Concepts: ${ctx.conceptualFramings.join(", ")}`);
-        }
-        priorLessons.push(parts.join("\n"));
-      }
-    }
-    if (priorLessons.length > 0) {
-      priorSummary = `\n\n## Previously Covered\nThe learner has completed these lessons. Only use grammar and vocabulary from these and the current lesson.\n\n${priorLessons.join("\n\n")}`;
-    }
-  }
-
-  // Use the original markdown — it's cleaner and better-structured than
-  // stripped HTML, which helps smaller models stay on-topic.
   const lessonMarkdown = readFileSync(
     path.join(LESSONS_DIR, `${lesson.slug}.md`),
     "utf-8"
   );
 
-  return `${COURSE_GUIDELINES}${priorSummary}
+  return `${SYSTEM_PROMPT}
 
 ## Current Lesson: ${lesson.number}. ${lesson.title}
 
-${lessonMarkdown}
-
----
-IMPORTANT: Only use vocabulary and grammar from this lesson and previously covered lessons. Do not introduce vocabulary or grammar patterns the learner has not seen yet.`;
+${lessonMarkdown}`;
 }
