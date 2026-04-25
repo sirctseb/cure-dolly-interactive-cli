@@ -67,10 +67,13 @@ export function Exercise({ lessonSlug }: { lessonSlug: string }) {
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (phase === "prompting") {
       inputRef.current?.focus();
+    } else if (phase === "feedback") {
+      nextButtonRef.current?.focus();
     }
   }, [phase]);
 
@@ -207,6 +210,7 @@ export function Exercise({ lessonSlug }: { lessonSlug: string }) {
         {/* Next button (shown after feedback) */}
         {phase === "feedback" && (
           <button
+            ref={nextButtonRef}
             onClick={() => fetchExercise(history)}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
           >
